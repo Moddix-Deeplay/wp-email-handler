@@ -1,0 +1,15 @@
+{
+  "name": "moddix/wp-email-handler",
+  "description": "Plugin for use SMTP for email delivery",
+  "version": "1.0.0",
+  "type": "wordpress-plugin",
+  "require": {
+    "php": ">=8.1",
+    "symfony/validator": "^7.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "Moddix\\WpEmailHandler\\": "src/"
+    }
+  }
+}
