@@ -5,7 +5,7 @@ namespace Moddix\WpEmailHandler;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validation;
-use function Env\env;
+use Env\Env;
 
 class WpEmailHandler
 {
@@ -33,14 +33,19 @@ class WpEmailHandler
     private function loadConfig(): void
     {
         $config = [
-            'from_name' => env('EMAIL_FROM_NAME'),
-            'from_email' => env('EMAIL_FROM_EMAIL'),
-            'host' => env('SMTP_HOST'),
-            'port' => env('SMTP_PORT'),
-            'user' => env('SMTP_USER'),
-            'pass' => env('SMTP_PASS'),
-            'secure' => env('SMTP_SECURE') ?: '', // 'tls' or 'ssl' or '' for insecure
-            'debug' => intval(env('SMTP_DEBUG') ?: 0), // 0, 1, or 2
+            'from_name' => Env::get('EMAIL_FROM_NAME'),
+            'from_email' => Env::get('EMAIL_FROM_EMAIL'),
+            'ssl' => [
+                'verify_peer' => Env::get('SMTP_SSL_VERIFY_PEER') ?? true,
+                'verify_peer_name' => Env::get('SMTP_SSL_VERIFY_PEER_NAME') ?? true,
+                'allow_self_signed' => Env::get('SMTP_SSL_ALLOW_SELF_SIGNED') ?? false,
+            ],
+            'host' => Env::get('SMTP_HOST'),
+            'port' => Env::get('SMTP_PORT'),
+            'user' => Env::get('SMTP_USER'),
+            'pass' => Env::get('SMTP_PASS'),
+            'secure' => Env::get('SMTP_SECURE') ?? '', // 'tls' or 'ssl' or '' for insecure
+            'debug' => Env::get('SMTP_DEBUG') ?? 0, // 0, 1, or 2
         ];
 
         $this->validateConfig($config);
@@ -56,6 +61,11 @@ class WpEmailHandler
                 new Assert\NotBlank(),
                 new Assert\Email(),
             ],
+            'ssl' => new Assert\Collection([
+                'verify_peer' => new Assert\Type('bool'),
+                'verify_peer_name' => new Assert\Type('bool'),
+                'allow_self_signed' => new Assert\Type('bool'),
+            ]),
             'host' => new Assert\AtLeastOneOf([
                 new Assert\Ip(),
                 new Assert\Hostname(),
@@ -99,9 +109,9 @@ class WpEmailHandler
             $phpmailer->SMTPOptions = [
                 'ssl' =>
                     [
-                        'verify_peer' => true,
-                        'verify_peer_name' => true,
-                        'allow_self_signed' => false
+                        'verify_peer' => $this->config['ssl']['verify_peer'],
+                        'verify_peer_name' => $this->config['ssl']['verify_peer_name'],
+                        'allow_self_signed' => $this->config['ssl']['allow_self_signed'],
                     ]
             ];
             $phpmailer->Host = $this->config['host'];

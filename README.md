@@ -12,6 +12,9 @@ Use an `.env` file to configure the plugin. Example:
 # Email settings
 EMAIL_FROM_NAME='Website name'
 EMAIL_FROM_EMAIL='noreply@example.com'
+SMTP_SSL_VERIFY_PEER=false# 'true' or 'false'
+SMTP_SSL_VERIFY_PEER_NAME=false# 'true' or 'false'
+SMTP_SSL_ALLOW_SELF_SIGNED=true# 'true' or 'false'
 SMTP_HOST=smtp.example.com
 SMTP_PORT=587
 SMTP_USER='noreply@example.com'
